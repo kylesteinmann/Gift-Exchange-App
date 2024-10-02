@@ -1,0 +1,29 @@
+{% extends 'gifts/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-6">My Groups</h1>
+    
+    {% if groups %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for group in groups %}
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h2 class="text-xl font-semibold mb-2">{{ group.name }}</h2>
+                    <p class="text-gray-600 mb-4">Members: {{ group.members.count }}</p>
+                    <a href="{% url 'group_detail' group.id %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        View Group
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-600">You are not a member of any groups yet.</p>
+    {% endif %}
+    
+    <div class="mt-8">
+        <a href="{% url 'create_group' %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Create New Group
+        </a>
+    </div>
+</div>
+{% endblock %}

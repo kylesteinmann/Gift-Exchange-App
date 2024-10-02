@@ -1,0 +1,11 @@
+{% extends 'gifts/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Logged Out</h1>
+    <p class="mb-4">You have been successfully logged out.</p>
+    <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Log In Again
+    </a>
+</div>
+{% endblock %}

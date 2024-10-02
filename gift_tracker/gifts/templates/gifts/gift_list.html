@@ -1,0 +1,42 @@
+{% extends 'gifts/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Gift Ideas for {{ group.name }}</h1>
+    
+    {% if gifts %}
+        <ul class="divide-y divide-gray-200">
+            {% for gift in gifts %}
+                <li class="py-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-semibold">{{ gift.name }}</h2>
+                            <p class="text-gray-600">Added by: {{ gift.user.username }}</p>
+                            {% if gift.description %}
+                                <p class="text-gray-700 mt-2">{{ gift.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if not gift.purchased and gift.user != request.user %}
+                                <a href="{% url 'mark_purchased' gift.id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                    Mark as Purchased
+                                </a>
+                            {% elif gift.purchased %}
+                                <span class="text-green-600 font-semibold">Purchased by {{ gift.purchased_by.username }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-600">No gift ideas yet.</p>
+    {% endif %}
+    
+    <div class="mt-8">
+        <a href="{% url 'add_gift' group.id %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Add Gift Idea
+        </a>
+    </div>
+</div>
+{% endblock %}

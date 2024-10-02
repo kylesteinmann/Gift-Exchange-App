@@ -1,0 +1,35 @@
+{% extends 'gifts/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">{{ group.name }}</h1>
+    
+    <h2 class="text-2xl font-semibold mb-4">Members</h2>
+    <ul class="list-disc list-inside mb-6">
+        {% for member in group.members.all %}
+            <li>{{ member.username }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h2 class="text-2xl font-semibold mb-4">Gift Ideas</h2>
+    {% if group.gift_ideas.all %}
+        <ul class="list-disc list-inside mb-6">
+            {% for gift in group.gift_ideas.all %}
+                <li>{{ gift.name }} (Added by: {{ gift.user.username }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="mb-6">No gift ideas yet.</p>
+    {% endif %}
+    
+    <a href="{% url 'gift_list' group.id %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+        View All Gifts
+    </a>
+    <a href="{% url 'add_gift' group.id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+        Add Gift Idea
+    </a>
+    <a href="{% url 'invite_user' group.id %}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+        Invite User
+    </a>
+</div>
+{% endblock %}

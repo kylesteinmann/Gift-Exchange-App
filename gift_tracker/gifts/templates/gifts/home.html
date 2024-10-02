@@ -1,0 +1,22 @@
+{% extends 'gifts/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Welcome to Gift Tracker</h1>
+    
+    {% if user.is_authenticated %}
+        <p class="mb-4">Hello, {{ user.username }}!</p>
+        <a href="{% url 'group_list' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            View My Groups
+        </a>
+    {% else %}
+        <p class="mb-4">Please log in to start tracking your gifts.</p>
+        <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+            Login
+        </a>
+        <a href="{% url 'register' %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Register
+        </a>
+    {% endif %}
+</div>
+{% endblock %}

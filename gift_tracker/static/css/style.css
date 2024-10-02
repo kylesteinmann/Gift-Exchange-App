@@ -1,0 +1,19 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.gift-card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.gift-card:hover {
+    transform: translateY(-5px);
+}
+
+.btn {
+    transition: background-color 0.3s ease-in-out;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
