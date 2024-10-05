@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Group, GiftIdea, Invitation
 from django.contrib import messages
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.db import models
@@ -13,6 +13,7 @@ from django.conf import settings
 from django.urls import reverse
 import random
 import string
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('home')
@@ -25,13 +26,13 @@ class CustomLogoutView(LogoutView):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'gifts/register.html', {'form': form})
 
 @login_required
@@ -49,7 +50,8 @@ def group_detail(request, group_id):
     if request.user not in group.members.all():
         messages.error(request, "You are not a member of this group.")
         return redirect('group_list')
-    return render(request, 'gifts/group_detail.html', {'group': group})
+    members = group.members.all().order_by('first_name', 'last_name')
+    return render(request, 'gifts/group_detail.html', {'group': group, 'members': members})
 
 @login_required
 def gift_list(request, group_id):
@@ -128,7 +130,7 @@ def invite_user(request, group_id):
             invitation_link = request.build_absolute_uri(
                 reverse('accept_invitation', args=[invitation_token])
             )
-            
+            print("invitation_link", invitation_link)
             # Send invitation email
             subject = f"Invitation to join {group.name} on Gift Tracker"
             message = f"You've been invited to join {group.name} on Gift Tracker. Click the link below to accept:\n\n{invitation_link}"
@@ -145,7 +147,6 @@ def invite_user(request, group_id):
     
     return render(request, 'gifts/invite_user.html', {'group': group})
 
-@login_required
 def accept_invitation(request, token):
     invitation = get_object_or_404(Invitation, token=token)
     
@@ -153,11 +154,21 @@ def accept_invitation(request, token):
         if request.user.is_authenticated:
             user = request.user
         else:
+            # Check if the email already exists
+            existing_user = User.objects.filter(email=invitation.email).first()
+            if existing_user:
+                messages.info(request, "An account with this email already exists. Please log in.")
+                return redirect('login')
+            
             # Create a new user
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            user = User.objects.create_user(username=username, email=invitation.email, password=password)
-            login(request, user)
+            form = CustomUserCreationForm(request.POST)
+            if form.is_valid():
+                user = form.save(commit=False)
+                user.email = invitation.email
+                user.save()
+                login(request, user)
+            else:
+                return render(request, 'gifts/accept_invitation.html', {'invitation': invitation, 'form': form})
         
         # Add user to the group
         invitation.group.members.add(user)
@@ -168,4 +179,33 @@ def accept_invitation(request, token):
         messages.success(request, f"You have successfully joined {invitation.group.name}.")
         return redirect('group_detail', group_id=invitation.group.id)
     
+    # If user is not authenticated, check if the email exists
+    if not request.user.is_authenticated:
+        existing_user = User.objects.filter(email=invitation.email).first()
+        if existing_user:
+            messages.info(request, "An account with this email already exists. Please log in.")
+            return redirect('login')
+        
+        form = CustomUserCreationForm(initial={'email': invitation.email})
+        return render(request, 'gifts/accept_invitation.html', {'invitation': invitation, 'form': form})
+    
     return render(request, 'gifts/accept_invitation.html', {'invitation': invitation})
+
+class CustomLoginView(LoginView):
+    form_class = CustomAuthenticationForm
+    template_name = 'gifts/login.html'
+
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            # Check if there's a 'next' parameter in the URL
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('home')
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'gifts/login.html', {'form': form})

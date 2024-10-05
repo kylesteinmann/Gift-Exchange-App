@@ -1,11 +1,12 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import login_view, CustomLoginView
 
 urlpatterns = [
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='gifts/login.html'), name='login'),
+    path('accounts/login/', login_view, name='login'),
     path('logout/', views.CustomLogoutView.as_view(), name='logout'),
     path('groups/', views.group_list, name='group_list'),
     path('groups/<int:group_id>/', views.group_detail, name='group_detail'),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('groups/<int:group_id>/invite/', views.invite_user, name='invite_user'),
     path('groups/<int:group_id>/accept_invitation/', views.accept_invitation, name='accept_invitation'),
     path('accept_invitation/<str:token>/', views.accept_invitation, name='accept_invitation'),
+    path('login/', CustomLoginView.as_view(), name='login'),
 ]
