@@ -1,35 +1,65 @@
 {% extends 'gifts/base.html' %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">{{ group.name }}</h1>
-    
-    <h2 class="text-2xl font-semibold mb-4">Members</h2>
-    <ul class="list-disc list-inside mb-6">
-        {% for member in members %}
-            <li>{{ member.first_name }} {{ member.last_name }}</li>
-        {% endfor %}
-    </ul>
-    
-    <h2 class="text-2xl font-semibold mb-4">Gift Ideas</h2>
-    {% if group.gift_ideas.all %}
-        <ul class="list-disc list-inside mb-6">
-            {% for gift in group.gift_ideas.all %}
-                <li>{{ gift.name }} (Added by: {{ gift.user.username }})</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="mb-6">No gift ideas yet.</p>
-    {% endif %}
-    
-    <a href="{% url 'gift_list' group.id %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
-        View All Gifts
+<h1 class="mb-4">{{ group.name }}</h1>
+
+<h2 class="h4 mb-3">Members</h2>
+<ul class="list-group mb-4">
+    {% for member in members %}
+        <li class="list-group-item">{{ member.first_name }} {{ member.last_name }}</li>
+    {% endfor %}
+</ul>
+
+<h2 class="h4 mb-3">Gift Ideas</h2>
+{% if gifts_by_user %}
+    {% for user, gifts in gifts_by_user.items %}
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h3 class="h5 mb-0">{{ user.first_name }} {{ user.last_name }}'s Gifts</h3>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for gift in gifts %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="h6 mb-1">{{ gift.name }}</h4>
+                                {% if gift.description %}
+                                    <p class="text-muted mb-0 small">{{ gift.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if not gift.purchased and gift.user != request.user %}
+                                    <a href="{% url 'mark_purchased' gift.id %}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-check me-1"></i>Mark as Purchased
+                                    </a>
+                                {% elif gift.purchased %}
+                                    {% if not gift.hide_purchased %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-gift me-1"></i>Purchased by {{ gift.purchased_by.username }}
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted mb-4">No gift ideas yet.</p>
+{% endif %}
+
+<div class="mb-3">
+    <a href="{% url 'add_gift' group.id %}" class="btn btn-success me-2">
+        <i class="fas fa-plus me-1"></i>Add Gift Idea
     </a>
-    <a href="{% url 'add_gift' group.id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
-        Add Gift Idea
-    </a>
-    <a href="{% url 'invite_user' group.id %}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
-        Invite User
+    <a href="{% url 'invite_user' group.id %}" class="btn btn-warning">
+        <i class="fas fa-user-plus me-1"></i>Invite User
     </a>
 </div>
+
+<a href="{% url 'add_gift' group.id %}" class="btn btn-danger btn-lg rounded-circle position-fixed bottom-0 end-0 m-4" style="width: 60px; height: 60px;">
+    <i class="fas fa-plus" style="font-size: 1.5rem;"></i>
+</a>
 {% endblock %}

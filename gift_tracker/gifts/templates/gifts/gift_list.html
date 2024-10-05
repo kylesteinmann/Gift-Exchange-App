@@ -1,42 +1,48 @@
 {% extends 'gifts/base.html' %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Gift Ideas for {{ group.name }}</h1>
-    
-    {% if gifts %}
-        <ul class="divide-y divide-gray-200">
-            {% for gift in gifts %}
-                <li class="py-4">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-xl font-semibold">{{ gift.name }}</h2>
-                            <p class="text-gray-600">Added by: {{ gift.user.username }}</p>
-                            {% if gift.description %}
-                                <p class="text-gray-700 mt-2">{{ gift.description }}</p>
-                            {% endif %}
+<h1 class="mb-4">Gift Ideas for {{ group.name }}</h1>
+
+{% if gifts_by_user %}
+    {% for user, gifts in gifts_by_user.items %}
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h2 class="h5 mb-0">{{ user.first_name }} {{ user.last_name }}'s Gifts</h2>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for gift in gifts %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="h6 mb-1">{{ gift.name }}</h3>
+                                {% if gift.description %}
+                                    <p class="text-muted mb-0 small">{{ gift.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if not gift.purchased and gift.user != request.user %}
+                                    <a href="{% url 'mark_purchased' gift.id %}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-check me-1"></i>Mark as Purchased
+                                    </a>
+                                {% elif gift.purchased %}
+                                    {% if not gift.hide_purchased %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-gift me-1"></i>Purchased by {{ gift.purchased_by.username }}
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
                         </div>
-                        <div>
-                            {% if not gift.purchased and gift.user != request.user %}
-                                <a href="{% url 'mark_purchased' gift.id %}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                    Mark as Purchased
-                                </a>
-                            {% elif gift.purchased %}
-                                <span class="text-green-600 font-semibold">Purchased by {{ gift.purchased_by.username }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-gray-600">No gift ideas yet.</p>
-    {% endif %}
-    
-    <div class="mt-8">
-        <a href="{% url 'add_gift' group.id %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Add Gift Idea
-        </a>
-    </div>
-</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">No gift ideas yet.</p>
+{% endif %}
+
+<a href="{% url 'add_gift' group.id %}" class="btn btn-danger btn-lg rounded-circle position-fixed bottom-0 end-0 m-4" style="width: 60px; height: 60px;">
+    <i class="fas fa-plus" style="font-size: 1.5rem;"></i>
+</a>
 {% endblock %}

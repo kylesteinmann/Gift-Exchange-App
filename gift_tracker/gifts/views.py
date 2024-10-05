@@ -14,6 +14,7 @@ from django.urls import reverse
 import random
 import string
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from django.db.models import Prefetch
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('home')
@@ -50,23 +51,20 @@ def group_detail(request, group_id):
     if request.user not in group.members.all():
         messages.error(request, "You are not a member of this group.")
         return redirect('group_list')
-    members = group.members.all().order_by('first_name', 'last_name')
-    return render(request, 'gifts/group_detail.html', {'group': group, 'members': members})
 
-@login_required
-def gift_list(request, group_id):
-    group = get_object_or_404(Group, id=group_id)
-    if request.user not in group.members.all():
-        messages.error(request, "You are not a member of this group.")
-        return redirect('group_list')
+    members = group.members.all()
     
-    gifts = GiftIdea.objects.filter(group=group)
+    gifts_by_user = {}
+    for member in members:
+        gifts = GiftIdea.objects.filter(group=group, user=member).select_related('user', 'purchased_by')
+        gifts_by_user[member] = gifts
+
     context = {
         'group': group,
-        'gifts': gifts,
-        'is_owner': request.user == group.members.first()
+        'members': members,
+        'gifts_by_user': gifts_by_user,
     }
-    return render(request, 'gifts/gift_list.html', context)
+    return render(request, 'gifts/group_detail.html', context)
 
 @login_required
 def add_gift(request, group_id):
@@ -80,7 +78,7 @@ def add_gift(request, group_id):
         description = request.POST.get('description')
         GiftIdea.objects.create(user=request.user, group=group, name=name, description=description)
         messages.success(request, "Gift idea added successfully.")
-        return redirect('gift_list', group_id=group_id)
+        return redirect('group_detail', group_id=group_id)
     
     return render(request, 'gifts/add_gift.html', {'group': group})
 
@@ -92,7 +90,7 @@ def mark_purchased(request, gift_id):
         gift.purchased_by = request.user
         gift.save()
         messages.success(request, "Gift marked as purchased.")
-    return redirect('gift_list', group_id=gift.group.id)
+    return redirect('group_detail', group_id=gift.group.id)
 
 @login_required
 def create_group(request):
