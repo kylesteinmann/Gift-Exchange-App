@@ -17,4 +17,5 @@ urlpatterns = [
     path('groups/<int:group_id>/accept_invitation/', views.accept_invitation, name='accept_invitation'),
     path('accept_invitation/<str:token>/', views.accept_invitation, name='accept_invitation'),
     path('login/', CustomLoginView.as_view(), name='login'),
+    path('groups/<int:group_id>/gifts/', views.gift_list, name='gift_list'),
 ]

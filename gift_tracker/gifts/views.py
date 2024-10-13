@@ -207,3 +207,8 @@ def login_view(request):
     else:
         form = CustomAuthenticationForm()
     return render(request, 'gifts/login.html', {'form': form})
+
+def gift_list(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    gifts = GiftIdea.objects.filter(group=group)
+    return render(request, 'gifts/gift_list.html', {'group': group, 'gifts': gifts})

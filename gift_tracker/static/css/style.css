@@ -1,6 +1,79 @@
+:root {
+    --primary-green: #135121;  /* Darker shade of green */
+    --primary-red: #941623;    /* Darker shade of red */
+    --bs-success: #135121;
+    --bs-danger: #941623;
+}
+
+html, body {
+    min-height: 100vh;
+}
+
 body {
-    background-color: #f0f0f0;
-    background-image: url('/static/images/gift-pattern.png');
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s, color 0.3s;
+    background-color: #343a40;
+    color: #f8f9fa;
+}
+
+body[data-bs-theme="light"] {
+    background-color: #ffffff;
+    color: #212529;
+}
+
+.navbar {
+    transition: background-color 0.3s;
+    background-color: #212529 !important;
+}
+
+body[data-bs-theme="light"] .navbar {
+    background-color: #f8f9fa !important;
+}
+
+.btn-outline-success {
+    color: var(--primary-green);
+    border-color: var(--primary-green);
+    --bs-btn-color: #135121;
+    --bs-btn-border-color: #135121;
+    --bs-btn-hover-bg: #135121;
+    --bs-btn-hover-border-color: #135121;
+    --bs-btn-active-bg: #135121;
+    --bs-btn-active-border-color: #135121;
+}
+
+.btn-outline-success:hover {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.btn-outline-danger {
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+    --bs-btn-color: #941623;
+    --bs-btn-border-color: #941623;
+    --bs-btn-hover-bg: #941623;
+    --bs-btn-hover-border-color: #941623;
+    --bs-btn-active-bg: #941623;
+    --bs-btn-active-border-color: #941623;
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--primary-red);
+    color: white;
+}
+
+.form-control:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.card {
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
 .gift-card {
@@ -12,9 +85,89 @@ body {
 }
 
 .btn {
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .btn:hover {
     opacity: 0.9;
+}
+
+.bg-body {
+    background-color: #212529 !important;
+}
+
+body[data-bs-theme="light"] .bg-body {
+    background-color: #ffffff !important;
+}
+
+.text-success {
+    color: #135121 !important;
+}
+
+.text-danger {
+    color: #941623 !important;
+}
+
+.bg-success {
+    background-color: #135121 !important;
+}
+
+.bg-danger {
+    background-color: #941623 !important;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    transition: background-color 0.3s, color 0.3s;
+    background-color: #212529;
+    color: #f8f9fa;
+}
+
+body[data-bs-theme="light"] footer {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.form-control, .form-select {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #ced4da;
+}
+
+body[data-bs-theme="dark"] .form-control,
+body[data-bs-theme="dark"] .form-select {
+    background-color: #343a40;
+    color: #ffffff;
+    border-color: #495057;
+}
+
+.btn-primary {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+}
+
+.card {
+    background-color: inherit;
+}
+
+body[data-bs-theme="dark"] .form-label {
+    color: #f8f9fa;
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+    color: #6c757d;
+}
+
+body[data-bs-theme="dark"] .form-control::placeholder,
+body[data-bs-theme="dark"] .form-select::placeholder {
+    color: #adb5bd;
 }
