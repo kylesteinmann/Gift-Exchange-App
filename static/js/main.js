@@ -18,5 +18,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    th
+    themeToggle.addEventListener('click', function() {
+        const currentTheme = body.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+
+    // Check for saved theme preference or use dark as default
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
 });
